@@ -55,14 +55,8 @@ class VideoPipeline:
                     )
                     self._video_resizer.resize(clip)
 
-                    self._logger.log_progress(stage=f"Scaling")
-                    self._video_scaler.scale(clip)
-
-                    self._logger.log_progress(stage=f"Generating background")
-                    self._background_generator.add_background(clip)
-
                     self._logger.log_progress(stage=f"Generating subtitles")
-                    subtitles = self._subtitle_generator.add_subtitles(clip)
+                    subtitles = self._subtitle_generator.generate_subtitles(clip)
 
                     self._logger.log_progress(stage=f"Removing pauses")
                     self._pause_remover.remove_pauses(clip, subtitles)

@@ -6,26 +6,26 @@ from utils.Logger import Logger
 
 
 class BackgroundGenerator(IBackgroundGenerator):
-    def __init__(self, logger: Logger, target_height: int = 1920):
-        self._target_height = target_height
+    def __init__(self, logger: Logger, target_ratio: tuple[int, int] = (9, 16)):
+        self._target_ratio = target_ratio
         self._logger = logger
 
     def add_background(self, file_path: str):
         clip = VideoFileClip(file_path)
-        width, height = clip.size
+        orig_width, orig_height = clip.size
+        target_width, target_height = self._target_ratio
+        target_ratio = target_width / target_height
 
-        self._logger.info(f"Current video resolution: {width}x{height}")
+        self._logger.info(f"Current video resolution: {orig_width}x{orig_height}")
 
-        if height > self._target_height:
-            self._logger.info(f"Adding background not possible!")
-            return
+        blurred_width = orig_width
+        blurred_height = int(orig_width / target_ratio)
 
-        scale_factor = self._target_height / height
-        target_width = int(width * scale_factor)
+        self._logger.info(f"Blurred clip resolution: {blurred_width}x{blurred_height}")
 
         blurred_clip = clip.image_transform(
-            lambda frame: BackgroundGenerator.__blur_and_resize_frame(
-                frame, target_width, self._target_height
+            lambda frame: self.__blur_and_resize_frame(
+                frame, blurred_width, blurred_height
             )
         )
 
@@ -34,7 +34,7 @@ class BackgroundGenerator(IBackgroundGenerator):
                 blurred_clip.with_position(("center", "center")),
                 clip.with_position(("center", "center")),
             ],
-            size=(width, self._target_height),
+            size=(orig_width, blurred_height),
         )
 
         temp_file_path = file_path.replace(".mp4", "_temp.mp4")
@@ -44,13 +44,17 @@ class BackgroundGenerator(IBackgroundGenerator):
         os.replace(temp_file_path, file_path)
 
         self._logger.info(
-            f"Background added successfully! New resolution: {width}x{self._target_height}"
+            f"Background added successfully! New resolution: {orig_width}x{blurred_height}"
         )
 
-    @staticmethod
-    def __blur_and_resize_frame(frame, target_width, target_height):
+    def __blur_and_resize_frame(self, frame, target_width, target_height):
         blurred_frame = cv2.GaussianBlur(frame, (51, 51), 0)
         resized_frame = cv2.resize(
             blurred_frame, (target_width, target_height), interpolation=cv2.INTER_LINEAR
         )
-        return resized_frame
+
+        new_width = int(target_height * self._target_ratio[0] / self._target_ratio[1])
+        start_x = target_width - new_width
+        cropped_frame = resized_frame[:, start_x : start_x + new_width]
+
+        return cropped_frame

@@ -30,11 +30,13 @@ class VideoResizer(IVideoResizer):
         logger: Logger,
         face_margin: int,
         aspect_ratio: tuple[int, int],
+        device: str,
     ):
         self._media_editor = media_editor
         self._logger = logger
         self._face_margin = face_margin
         self._aspect_ratio = aspect_ratio
+        self._device = device
 
     def resize(self, file_path: str):
         media_file = AudioVideoFile(file_path)
@@ -70,4 +72,5 @@ class VideoResizer(IVideoResizer):
             face_detect_width=original_width,
             face_detect_margin=self._face_margin,
             aspect_ratio=self._aspect_ratio,
+            device=self._device,
         )

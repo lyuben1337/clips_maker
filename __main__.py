@@ -1,7 +1,7 @@
 from utils.Logger import Logger
 
 logger = Logger()
-logger.set_level("DEBUG")
+logger.set_level("INFO")
 
 import os
 import types
@@ -28,10 +28,12 @@ from services.PauseRemover import PauseRemover
 
 if __name__ == "__main__":
     media_editor = MediaEditor()
-    clip_finder = ClipFinder()
+    clip_finder = ClipFinder(device="cuda")
 
     frame_rate_reducer = FrameRateReducer(target_fps=30, logger=logger)
-    video_transcriber = VideoTranscriber(model_size="turbo", logger=logger)
+    video_transcriber = VideoTranscriber(
+        model_size="turbo", logger=logger, device="cuda"
+    )
     video_trimmer = VideoTrimmer(
         media_editor=media_editor,
         clip_finder=clip_finder,
@@ -40,14 +42,18 @@ if __name__ == "__main__":
         logger=logger,
     )
     video_resizer = VideoResizer(
-        media_editor=media_editor, logger=logger, face_margin=300, aspect_ratio=(3, 4)
+        media_editor=media_editor,
+        logger=logger,
+        face_margin=300,
+        aspect_ratio=(3, 4),
+        device="cuda",
     )
     video_scaler = VideoScaler(target_width=1080, ai=True, logger=logger)
-    background_generator = BackgroundGenerator(target_height=1920, logger=logger)
+    background_generator = BackgroundGenerator(target_ratio=(9, 16), logger=logger)
     subtitle_generator = SubtitleGenerator(
+        device="cuda",
         max_words_per_line=2,
         font_path=os.path.join(ASSERTS_PATH, "DelaGothicOne-Regular.ttf"),
-        font_size=72,
         color="white",
         stroke_width=2,
         stroke_color="black",

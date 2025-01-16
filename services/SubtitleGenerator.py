@@ -12,9 +12,9 @@ from utils.Logger import Logger
 class SubtitleGenerator(ISubtitleGenerator):
     def __init__(
         self,
+        device: str,
         max_words_per_line: int,
         font_path: str,
-        font_size: int,
         color: str,
         logger: Logger,
         stroke_color: str = None,
@@ -22,20 +22,18 @@ class SubtitleGenerator(ISubtitleGenerator):
     ):
         self._max_words_per_line = max_words_per_line
         self._font_path = font_path
-        self._font_size = font_size
         self._color = color
         self._stroke_color = stroke_color
         self._stroke_width = stroke_width
         self._logger = logger
+        self._device = device
 
-    def add_subtitles(self, file_path: str) -> list:
-        subtitles = self.__generate_subtitles(file_path)
+    def add_subtitles(self, file_path: str, subtitles: list):
         video = VideoFileClip(file_path)
 
         self._logger.info(f"Detected {len(subtitles)} subtitles")
         self._logger.info(f"Adding subtitles to video with the following format:")
         self._logger.info(f"Font: {os.path.basename(self._font_path)}")
-        self._logger.info(f"Font size: {self._font_size}")
         self._logger.info(f"Color: {self._color}")
         if self._stroke_color:
             self._logger.info(f"Stroke color: {self._stroke_color}")
@@ -58,17 +56,19 @@ class SubtitleGenerator(ISubtitleGenerator):
         return subtitles
 
     def __subtitle_generator(self, txt: str, start: int, end: int, size):
+        _, video_height = size
+        fontsize = int(video_height * 0.0375)
         return (
             TextClip(
                 text=txt,
                 font=self._font_path,
-                font_size=self._font_size,
                 color=self._color,
                 duration=end - start,
                 stroke_color=self._stroke_color,
                 stroke_width=self._stroke_width,
                 method="caption",
                 text_align="center",
+                font_size=fontsize,
                 size=size,
             )
             .with_effects([CrossFadeIn(0.1), CrossFadeOut(0.1)])
@@ -76,8 +76,8 @@ class SubtitleGenerator(ISubtitleGenerator):
             .with_end(end)
         )
 
-    def __generate_subtitles(self, file_path: str) -> list:
-        model = whisper.load_model("turbo")
+    def generate_subtitles(self, file_path: str) -> list:
+        model = whisper.load_model("turbo", device=self._device)
 
         self._logger.info("Using whisper model turbo")
 

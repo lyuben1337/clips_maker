@@ -36,7 +36,7 @@ class VideoTranscriber(Transcriber, IVideoTranscriber):
         if model_size is None:
             model_size = "large-v2" if torch.cuda.is_available() else "tiny"
 
-        assert_valid_torch_device(device)
+        # assert_valid_torch_device(device)
         self._config_manager.assert_valid_model_size(model_size)
         self._config_manager.assert_valid_precision(precision)
 

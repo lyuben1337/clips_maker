@@ -14,7 +14,6 @@ resources/sources/
 __pycache__/
 *.pyc
 *.pyo
-.env
 
 # Other temporary files
 .DS_Store
