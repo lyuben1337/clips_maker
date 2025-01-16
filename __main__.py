@@ -48,7 +48,7 @@ if __name__ == "__main__":
         aspect_ratio=(3, 4),
         device="cuda",
     )
-    video_scaler = VideoScaler(target_width=1080, ai=True, logger=logger)
+    # video_scaler = VideoScaler(target_width=1080, ai=True, logger=logger)
     background_generator = BackgroundGenerator(target_ratio=(9, 16), logger=logger)
     subtitle_generator = SubtitleGenerator(
         device="cuda",
@@ -69,7 +69,6 @@ if __name__ == "__main__":
         video_transcriber=video_transcriber,
         video_trimmer=video_trimmer,
         video_resizer=video_resizer,
-        video_scaler=video_scaler,
         background_generator=background_generator,
         subtitle_generator=subtitle_generator,
         pause_remover=pause_remover,

@@ -40,7 +40,7 @@ class VideoScaler(IVideoScaler):
                 scale=netscale,
                 model_path=model_url,
                 model=model,
-                device=torch.device("mps"),
+                device=torch.device("cuda"),
             )
 
     @staticmethod

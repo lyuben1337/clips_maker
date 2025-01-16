@@ -19,7 +19,6 @@ class VideoPipeline:
         video_transcriber: IVideoTranscriber,
         video_trimmer: IVideoTrimmer,
         video_resizer: IVideoResizer,
-        video_scaler: IVideoScaler,
         background_generator: IBackgroundGenerator,
         subtitle_generator: ISubtitleGenerator,
         pause_remover: IPauseRemover,
@@ -29,7 +28,6 @@ class VideoPipeline:
         self._video_transcriber = video_transcriber
         self._video_trimmer = video_trimmer
         self._video_resizer = video_resizer
-        self._video_scaler = video_scaler
         self._background_generator = background_generator
         self._subtitle_generator = subtitle_generator
         self._pause_remover = pause_remover
