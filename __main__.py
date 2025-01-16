@@ -1,7 +1,7 @@
 from utils.Logger import Logger
 
 logger = Logger()
-logger.set_level("INFO")
+logger.set_level("DEBUG")
 
 import os
 import types
