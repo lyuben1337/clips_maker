@@ -1,0 +1,21 @@
+# PyCharm
+.idea
+
+# Ignore virtual environment files
+.venv/
+bin/
+lib/
+include/
+share/
+resources/results/
+resources/sources/
+
+# Ignore Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# Other temporary files
+.DS_Store
+*.log
