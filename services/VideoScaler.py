@@ -152,12 +152,12 @@ class VideoScaler(IVideoScaler):
             "-i",
             temp_audio_path,
             "-c:v",
-            "libx264",  # Encode video
+            "libx264",
             "-pix_fmt",
             "yuv420p",
             "-c:a",
-            "copy",  # Copy original audio parameters
-            "-shortest",  # Ensures video and audio durations match
+            "copy",
+            "-shortest",
             output_video_path,
         ]
         subprocess.run(

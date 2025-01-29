@@ -72,5 +72,4 @@ class VideoResizer(IVideoResizer):
             face_detect_width=original_width,
             face_detect_margin=self._face_margin,
             aspect_ratio=self._aspect_ratio,
-            device=self._device,
         )

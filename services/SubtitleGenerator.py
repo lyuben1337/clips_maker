@@ -1,3 +1,4 @@
+import json
 import os.path
 import re
 
@@ -13,10 +14,10 @@ class SubtitleGenerator(ISubtitleGenerator):
     def __init__(
         self,
         device: str,
-        max_words_per_line: int,
         font_path: str,
         color: str,
         logger: Logger,
+        max_words_per_line: int = None,
         stroke_color: str = None,
         stroke_width: int = None,
     ):
@@ -77,16 +78,25 @@ class SubtitleGenerator(ISubtitleGenerator):
         )
 
     def generate_subtitles(self, file_path: str) -> list:
-        model = whisper.load_model("turbo", device=self._device)
+        model = whisper.load_model("turbo")
 
         self._logger.info("Using whisper model turbo")
 
         result = model.transcribe(
             file_path,
-            word_timestamps=True,
+            word_timestamps=self._max_words_per_line is not None,
         )
 
         subtitles = []
+
+        if not self._max_words_per_line:
+            for segment in result["segments"]:
+                start = segment["start"]
+                end = segment["end"]
+                text = re.sub(r"[^\w\s]", "", segment["text"])
+                subtitles.append(((start, end), text))
+            return subtitles
+
         self._logger.info(f"Max words per line: {self._max_words_per_line}")
 
         for segment in result["segments"]:
@@ -104,3 +114,20 @@ class SubtitleGenerator(ISubtitleGenerator):
                 subtitles.append(((start, end), text))
 
         return subtitles
+
+    def save_to_file(self, file_path: str, subtitles: list):
+        try:
+            with open(file_path, "x", encoding="utf-8") as file:
+                json.dump(subtitles, file, indent=4, ensure_ascii=False)
+            print(f"Subtitles successfully saved to {file_path}")
+        except Exception as e:
+            print(f"Error saving subtitles to file: {str(e)}")
+
+    def load_from_file(self, file_path: str) -> list:
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:
+                subtitles = json.load(file)
+            print(f"Subtitles successfully loaded from {file_path}")
+            return subtitles
+        except Exception as e:
+            print(f"Error loading subtitles from file: {str(e)}")

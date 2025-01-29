@@ -17,6 +17,7 @@ class VideoPipeline:
         self,
         frame_rate_reducer: IFrameRateReducer,
         video_transcriber: IVideoTranscriber,
+        video_scaler: IVideoScaler,
         video_trimmer: IVideoTrimmer,
         video_resizer: IVideoResizer,
         background_generator: IBackgroundGenerator,
@@ -27,6 +28,7 @@ class VideoPipeline:
         self._frame_rate_reducer = frame_rate_reducer
         self._video_transcriber = video_transcriber
         self._video_trimmer = video_trimmer
+        self._video_scaler = video_scaler
         self._video_resizer = video_resizer
         self._background_generator = background_generator
         self._subtitle_generator = subtitle_generator
@@ -45,20 +47,30 @@ class VideoPipeline:
 
             self._logger.log_progress(stage=f"Trimming into clips")
             clips = self._video_trimmer.trim_clips(transcription, file_path)
-            for i, clip in enumerate(clips, start=1):
-                try:
-                    self._logger.log_progress(
-                        subtitle=f"Processing clip ({i}/{len(clips)}) {os.path.basename(clip)}",
-                        stage=f"Resizing",
-                    )
-                    self._video_resizer.resize(clip)
+            # for i, clip in enumerate(clips, start=1):
+            # try:
+            # self._logger.log_progress(
+            #     subtitle=f"Processing clip ({i}/{len(clips)}) {os.path.basename(clip)}",
+            #     stage=f"Resizing",
+            # )
+            # self._video_resizer.resize(clip)
+            #
+            # self._logger.log_progress(stage=f"Adding background")
+            # self._background_generator.add_background(clip)
+            #
+            # self._logger.log_progress(stage=f"Scaling")
+            # self._video_scaler.scale(clip)
+            #
+            # self._logger.log_progress(stage=f"Generating subtitles")
+            # subtitles = self._subtitle_generator.generate_subtitles(clip)
+            #
+            # self._logger.log_progress(stage=f"Adding subtitles")
+            # self._subtitle_generator.add_subtitles(clip, subtitles)
+            #
+            # self._logger.log_progress(stage=f"Removing pauses")
+            # self._pause_remover.remove_pauses(clip, subtitles)
 
-                    self._logger.log_progress(stage=f"Generating subtitles")
-                    subtitles = self._subtitle_generator.generate_subtitles(clip)
-
-                    self._logger.log_progress(stage=f"Removing pauses")
-                    self._pause_remover.remove_pauses(clip, subtitles)
-                except Exception as e:
-                    self._logger.error(f"Clip {clip} processing failed: {str(e)}")
+            # except Exception as e:
+            #     self._logger.error(f"Clip {clip} processing failed: {str(e)}")
         except Exception as e:
             self._logger.error(f"Video processing pipeline failed: {str(e)}")
